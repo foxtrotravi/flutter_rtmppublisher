@@ -50,8 +50,24 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       TextEditingController(text: "rtmp://94.237.49.12/live/arun");
 
   Timer? _timer;
-  List<CameraDescription>? cameras;
+  late List<CameraDescription> cameras;
   bool enableCamera = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initCameras();
+  }
+
+  Future<void> initCameras() async {
+    // Fetch the available cameras before initializing the app.
+    try {
+      WidgetsFlutterBinding.ensureInitialized();
+      cameras = (await availableCameras())!;
+    } on CameraException catch (e) {
+      logError(e.code, e.description);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +186,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                   enableCamera ? Colors.green[700]! : Colors.red,
                   'Video',
                   () {
-                    if (cameras != null || cameras!.isNotEmpty) {
+                    if (cameras != null || (cameras?.isNotEmpty ?? true)) {
                       var frontCamera;
                       for (final cameraDescription in cameras!) {
                         if (cameraDescription.lensDirection ==
@@ -795,4 +811,12 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     logError(e.code, e.description);
     showInSnackBar('Error: ${e.code}\n${e.description}');
   }
+}
+
+Future<void> main() async {
+  runApp(
+    MaterialApp(
+      home: CameraExampleHome(),
+    ),
+  );
 }
