@@ -76,7 +76,7 @@ CameraLensDirection _parseCameraLensDirection(String string) {
 /// Completes with a list of available cameras.
 ///
 /// May throw a [CameraException].
-Future<List<CameraDescription>?> availableCameras() async {
+Future<List<CameraDescription>?>? availableCameras() async {
   try {
     final List<Map<dynamic, dynamic>>? cameras = await _channel
         .invokeListMethod<Map<dynamic, dynamic>>('availableCameras');
@@ -255,7 +255,8 @@ class CameraValue {
   /// Convenience getter for `previewSize.height / previewSize.width`.
   ///
   /// Can only be called when [initialize] is done.
-  double? get aspectRatio => (previewSize?.height ?? 1) / (previewSize?.width ?? 1);
+  double? get aspectRatio =>
+      (previewSize?.height ?? 1) / (previewSize?.width ?? 1);
 
   bool? get hasError => errorDescription != null;
 
@@ -327,7 +328,7 @@ class CameraController extends ValueNotifier<CameraValue> {
   StreamSubscription<dynamic>? _eventSubscription;
   StreamSubscription<dynamic>? _imageStreamSubscription;
   late Completer<void> _creatingCompleter;
-   bool?  androidUseOpenGL;
+  bool? androidUseOpenGL;
 
   /// Initializes the camera on the device.
   ///

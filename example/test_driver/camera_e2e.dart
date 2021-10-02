@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
-  Directory testDir;
+  Directory? testDir;
 
   E2EWidgetsFlutterBinding.ensureInitialized();
 
@@ -20,7 +20,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await testDir.delete(recursive: true);
+    await testDir?.delete(recursive: true);
   });
 
   final Map<ResolutionPreset, Size> presetExpectedSizes =
@@ -50,13 +50,13 @@ void main() {
   // whether the image is exactly the desired resolution.
   Future<bool> testCaptureImageResolution(
       CameraController controller, ResolutionPreset preset) async {
-    final Size expectedSize = presetExpectedSizes[preset];
+    final Size? expectedSize = presetExpectedSizes[preset];
     print(
-        'Capturing photo at $preset (${expectedSize.width}x${expectedSize.height}) using camera ${controller.description.name}');
+        'Capturing photo at $preset (${expectedSize?.width}x${expectedSize?.height}) using camera ${controller.description.name}');
 
     // Take Picture
     final String filePath =
-        '${testDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        '${testDir?.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
     await controller.takePicture(filePath);
 
     // Load picture
@@ -66,16 +66,18 @@ void main() {
     // Verify image dimensions are as expected
     expect(image, isNotNull);
     return assertExpectedDimensions(
-        expectedSize, Size(image.height.toDouble(), image.width.toDouble()));
+        expectedSize!, Size(image.height.toDouble(), image.width.toDouble()));
   }
 
   testWidgets('Capture specific image resolutions',
       (WidgetTester tester) async {
-    final List<CameraDescription> cameras = await availableCameras();
-    if (cameras.isEmpty) {
+    final List<CameraDescription?>? cameras = await availableCameras();
+    if (cameras == null || cameras.isEmpty) {
       return;
     }
-    for (CameraDescription cameraDescription in cameras) {
+
+    for (int i = 0; i < cameras.length; i++) {
+      CameraDescription cameraDescription = cameras[i]!;
       bool previousPresetExactlySupported = true;
       for (MapEntry<ResolutionPreset, Size> preset
           in presetExpectedSizes.entries) {
@@ -97,13 +99,13 @@ void main() {
   // whether the image is exactly the desired resolution.
   Future<bool> testCaptureVideoResolution(
       CameraController controller, ResolutionPreset preset) async {
-    final Size expectedSize = presetExpectedSizes[preset];
+    final Size expectedSize = presetExpectedSizes[preset]!;
     print(
         'Capturing video at $preset (${expectedSize.width}x${expectedSize.height}) using camera ${controller.description.name}');
 
     // Take Video
     final String filePath =
-        '${testDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+        '${testDir?.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
     await controller.startVideoRecording(filePath);
     sleep(const Duration(milliseconds: 300));
     await controller.stopVideoRecording();
@@ -123,11 +125,12 @@ void main() {
 
   testWidgets('Capture specific video resolutions',
       (WidgetTester tester) async {
-    final List<CameraDescription> cameras = await availableCameras();
-    if (cameras.isEmpty) {
+    final List<CameraDescription?>? cameras = await availableCameras();
+    if (cameras == null || cameras.isEmpty) {
       return;
     }
-    for (CameraDescription cameraDescription in cameras) {
+    for (int i = 0; i < cameras.length; i++) {
+      CameraDescription cameraDescription = cameras[i]!;
       bool previousPresetExactlySupported = true;
       for (MapEntry<ResolutionPreset, Size> preset
           in presetExpectedSizes.entries) {
@@ -146,13 +149,13 @@ void main() {
   }, skip: !Platform.isAndroid);
 
   testWidgets('Pause and resume video recording', (WidgetTester tester) async {
-    final List<CameraDescription> cameras = await availableCameras();
-    if (cameras.isEmpty) {
+    final List<CameraDescription?>? cameras = await availableCameras();
+    if (cameras == null || cameras.isEmpty) {
       return;
     }
 
     final CameraController controller = CameraController(
-      cameras[0],
+      cameras[0]!,
       ResolutionPreset.low,
       enableAudio: false,
     );
@@ -161,7 +164,7 @@ void main() {
     await controller.prepareForVideoRecording();
 
     final String filePath =
-        '${testDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+        '${testDir?.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
 
     int startPause;
     int timePaused = 0;
@@ -204,13 +207,13 @@ void main() {
   testWidgets(
     'Android image streaming',
     (WidgetTester tester) async {
-      final List<CameraDescription> cameras = await availableCameras();
-      if (cameras.isEmpty) {
+      final List<CameraDescription?>? cameras = await availableCameras();
+      if (cameras == null || cameras.isEmpty) {
         return;
       }
 
       final CameraController controller = CameraController(
-        cameras[0],
+        cameras[0]!,
         ResolutionPreset.low,
         enableAudio: false,
       );

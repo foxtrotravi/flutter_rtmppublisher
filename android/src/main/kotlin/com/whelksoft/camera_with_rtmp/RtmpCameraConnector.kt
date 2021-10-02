@@ -240,7 +240,9 @@ class RtmpCameraConnector(val context: Context, val useOpenGL: Boolean, val isPo
 
     fun startEncoders() {
         videoEncoder!!.start()
-        audioEncoder!!.start()
+        if (audioEncoder.prepareAudioEncoder()) {
+            audioEncoder!!.start()
+        }
         microphoneManager!!.start()
     }
 
